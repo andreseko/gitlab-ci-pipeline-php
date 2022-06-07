@@ -1,10 +1,10 @@
-FROM php:8.0-alpine
+FROM php:8.0.2-alpine
 
 ARG BUILD_DATE
 ARG VCS_REF
 
 LABEL maintainer="Eduardo Bizarro <edbizarro@gmail.com>" \
-      PHP="8.0" \
+      PHP="8.0.2" \
       NODE="14.15.0" \
       org.label-schema.name="edbizarro/gitlab-ci-pipeline-php" \
       org.label-schema.description=":coffee: Docker images for build and test PHP applications with Gitlab CI (or any other CI plataform!)" \
@@ -22,7 +22,7 @@ ENV GOSS_VERSION="0.3.16"
 ENV NODE_VERSION="14"
 ENV NPM_VERSION=6
 ENV YARN_VERSION=latest
-ENV PHP_VERSION=8.0
+ENV PHP_VERSION=8.0.2
 
 WORKDIR /tmp
 
