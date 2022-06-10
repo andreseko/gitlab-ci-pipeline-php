@@ -69,6 +69,13 @@ export runtimeDeps=" \
     libxslt1-dev \
     libzip-dev \
     multiarch-support \
+    debconf \
+    debconf-utils \
+    unixodbc \
+    unixodbc-dev \
+    tdsodbc \
+    libaio1 \
+    re2c \
     "
 
 
@@ -95,6 +102,25 @@ else
     && docker-php-ext-install -j$(nproc) imap \
     && docker-php-source delete
 fi
+
+#OCI
+cd /opt/oracle \
+   && curl -0 https://download.oracle.com/otn_software/linux/instantclient/191000/instantclient-basic-linux.arm64-19.10.0.0.0dbru.zip -o instantclient-basic-linux.arm64-19.10.0.0.0dbru.zip \
+   && curl -0 https://download.oracle.com/otn_software/linux/instantclient/191000/instantclient-sdk-linux.arm64-19.10.0.0.0dbru.zip -o instantclient-sdk-linux.arm64-19.10.0.0.0dbru.zip \
+   && unzip /opt/oracle/instantclient-basic-linux.arm64-19.10.0.0.0dbru.zip -d /opt/oracle \
+   && unzip /opt/oracle/instantclient-sdk-linux.arm64-19.10.0.0.0dbru.zip -d /opt/oracle \
+   && rm -rf /opt/oracle/*.zip \
+   && export ORACLE_HOME=/opt/oracle/instantclient_19_10 \
+   && export LD_LIBRARY_PATH=/opt/oracle/instantclient_19_10 \
+   && echo /opt/oracle/instantclient_19_10 > /etc/ld.so.conf.d/oracle-instantclient.conf \
+   && ldconfig
+
+docker-php-ext-configure pdo_oci --with-pdo-oci="instantclient,/opt/oracle/instantclient_19_10,19.1" \
+  && pecl channel-update pecl.php.net \
+  && echo "instantclient,/opt/oracle/instantclient_19_10" | pecl install oci8-3.0.1
+
+docker-php-ext-install pdo_oci
+docker-php-ext-enable oci8
 
 if ! [[ $PHP_VERSION == "8.0" ]]; then
   docker-php-source extract \
@@ -152,9 +178,7 @@ if ! [[ $PHP_VERSION == "8.0" ]]; then
     && cd .. \
     && rm -rf xmlrpc \
     && docker-php-ext-enable xmlrpc
-
 else
-
   docker-php-source extract \
     && curl -L -o /tmp/cassandra-cpp-driver.deb "https://downloads.datastax.com/cpp-driver/ubuntu/18.04/cassandra/v2.14.0/cassandra-cpp-driver_2.14.0-1_amd64.deb" \
     && curl -L -o /tmp/cassandra-cpp-driver-dev.deb "https://downloads.datastax.com/cpp-driver/ubuntu/18.04/cassandra/v2.14.0/cassandra-cpp-driver-dev_2.14.0-1_amd64.deb" \

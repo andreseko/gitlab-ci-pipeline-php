@@ -3,14 +3,14 @@ FROM php:8.0.2-alpine
 ARG BUILD_DATE
 ARG VCS_REF
 
-LABEL maintainer="Eduardo Bizarro <edbizarro@gmail.com>" \
-  PHP="8.0.2" \
+LABEL maintainer="Andre Goncalves <andreseko@gmail.com>" \
+  PHP="8.0" \
   NODE="14" \
-  org.label-schema.name="edbizarro/gitlab-ci-pipeline-php" \
+  org.label-schema.name="andreseko/gitlab-ci-pipeline-php" \
   org.label-schema.description=":coffee: Docker images for build and test PHP applications with Gitlab CI (or any other CI plataform!)" \
   org.label-schema.build-date=$BUILD_DATE \
   org.label-schema.schema-version="1.0" \
-  org.label-schema.vcs-url="https://github.com/edbizarro/gitlab-ci-pipeline-php" \
+  org.label-schema.vcs-url="https://github.com/andreseko/gitlab-ci-pipeline-php" \
   org.label-schema.vcs-ref=$VCS_REF
 
 # Set correct environment variables
@@ -22,7 +22,7 @@ ENV GOSS_VERSION="0.3.16"
 ENV NODE_VERSION=14
 ENV NPM_VERSION=6
 ENV YARN_VERSION=latest
-ENV PHP_VERSION=8.0.2
+ENV PHP_VERSION=8.0
 
 WORKDIR /tmp
 
@@ -30,6 +30,8 @@ COPY ./php/scripts/alpine/*.sh /tmp/
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY --from=mhart/alpine-node:14 /usr/bin/node /usr/bin/
 COPY --from=mhart/alpine-node:14 /usr/lib/libgcc* /usr/lib/libstdc* /usr/lib/* /usr/lib/
+
+RUN mkdir -p /opt/oracle
 
 # COPY INSTALL SCRIPTS
 RUN chmod +x /tmp/*.sh \
@@ -39,10 +41,9 @@ RUN chmod +x /tmp/*.sh \
   && bash ./packages.sh \
   && bash ./extensions.sh \
   && bash ./nodeyarn.sh \
-  && rm -rf ~/.composer/cache/* \
+  && sudo mkdir $COMPOSER_HOME && sudo rm -rf $COMPOSER_HOME/cache/* \
   && chown -R $IMAGE_USER:$IMAGE_USER /var/www $HOME \
   && echo "$IMAGE_USER  ALL = ( ALL ) NOPASSWD: ALL" >> /etc/sudoers \
-  && curl -fsSL https://goss.rocks/install | GOSS_VER=v${GOSS_VERSION} sh \
   && bash ./cleanup.sh
 
 USER $IMAGE_USER
