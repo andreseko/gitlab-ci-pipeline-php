@@ -105,19 +105,20 @@ fi
 
 #OCI
 cd /opt/oracle \
-   && curl -0 https://download.oracle.com/otn_software/linux/instantclient/191000/instantclient-basic-linux.arm64-19.10.0.0.0dbru.zip -o instantclient-basic-linux.arm64-19.10.0.0.0dbru.zip \
-   && curl -0 https://download.oracle.com/otn_software/linux/instantclient/191000/instantclient-sdk-linux.arm64-19.10.0.0.0dbru.zip -o instantclient-sdk-linux.arm64-19.10.0.0.0dbru.zip \
-   && unzip /opt/oracle/instantclient-basic-linux.arm64-19.10.0.0.0dbru.zip -d /opt/oracle \
-   && unzip /opt/oracle/instantclient-sdk-linux.arm64-19.10.0.0.0dbru.zip -d /opt/oracle \
+   && curl -0 https://download.oracle.com/otn_software/linux/instantclient/216000/instantclient-basic-linux.x64-21.6.0.0.0dbru.zip -o instantclient-basic-linux.x64-21.6.0.0.0dbru.zip \
+   && curl -0 https://download.oracle.com/otn_software/linux/instantclient/216000/instantclient-sdk-linux.x64-21.6.0.0.0dbru.zip -o instantclient-sdk-linux.x64-21.6.0.0.0dbru.zip \
+   && unzip /opt/oracle/instantclient-basic-linux.x64-21.6.0.0.0dbru.zip -d /opt/oracle \
+   && unzip /opt/oracle/instantclient-sdk-linux.x64-21.6.0.0.0dbru.zip -d /opt/oracle \
+   && mv /opt/oracle/instantclient_21_6 /opt/oracle/instantclient \
    && rm -rf /opt/oracle/*.zip \
-   && export ORACLE_HOME=/opt/oracle/instantclient_19_10 \
-   && export LD_LIBRARY_PATH=/opt/oracle/instantclient_19_10 \
-   && echo /opt/oracle/instantclient_19_10 > /etc/ld.so.conf.d/oracle-instantclient.conf \
+   && export ORACLE_HOME=/opt/oracle/instantclient \
+   && export LD_LIBRARY_PATH=/opt/oracle/instantclient \
+   && echo /opt/oracle/instantclient > /etc/ld.so.conf.d/oracle-instantclient.conf \
    && ldconfig
 
-docker-php-ext-configure pdo_oci --with-pdo-oci="instantclient,/opt/oracle/instantclient_19_10,19.1" \
+docker-php-ext-configure pdo_oci --with-pdo-oci="instantclient,/opt/oracle/instantclient,21.1" \
   && pecl channel-update pecl.php.net \
-  && echo "instantclient,/opt/oracle/instantclient_19_10" | pecl install oci8-3.0.1
+  && echo "instantclient,/opt/oracle/instantclient" | pecl install oci8-3.0.1
 
 docker-php-ext-install pdo_oci
 docker-php-ext-enable oci8
